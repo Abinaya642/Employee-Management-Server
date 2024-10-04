@@ -1,11 +1,10 @@
 const Employee = require("../model/empModel");
 const cloudinary = require("cloudinary").v2;
 
-// Employee creation
+// Employee data creation
 const uploadToCloudinary = (fileBuffer) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      //   { folder: "Employee" },
       (error, result) => {
         if (error) return reject(error);
         resolve(result.secure_url);
@@ -28,15 +27,7 @@ const createEmployee = async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (
-      !EmployeeName ,
-      !EmployeeID ,
-      !Department ,
-      !Designation ,
-      !Project ,
-      !Type ,
-      !Status
-    ) {
+    if ( !EmployeeName ||!EmployeeID ||!Department || !Designation || !Project ||!Type ||!Status ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
@@ -45,7 +36,7 @@ const createEmployee = async (req, res) => {
     let imageUrl = "";
     // Upload to Cloudinary
     if (req.file) {
-      // Convert buffer to base64
+      //  buffer to base64 conversion
       const base64Image = req.file.buffer.toString("base64");
       const imageData = `data:${req.file.mimetype};base64,${base64Image}`;
 
@@ -55,19 +46,20 @@ const createEmployee = async (req, res) => {
         unique_filename: false,
         overwrite: true,
       });
-      imageUrl = result.secure_url; // Get the secure URL from Cloudinary
+      // Getting secure_url from Cloudinary
+      imageUrl = result.secure_url; 
       console.log(result)
     }
-    // Create new employee
+    //new employee creation
     const newEmployee = new Employee({
       ...req.body,
-      Image: imageUrl, // Save the image URL to the database
+      Image: imageUrl, // Save image url to database
     });
 
-    // Save to the database
+    // Save to database
     await newEmployee.save();
 
-    // Respond with the created employee
+    // created employee response
     res.status(201).json({
       success: true,
       message: "Employee created successfully",
@@ -82,7 +74,7 @@ const createEmployee = async (req, res) => {
   }
 };
 
-// Read All Employees
+// get All Employees
 const getAllEmployees = async (req, res) => {
   try {
     const employees = await Employee.find();
@@ -127,9 +119,7 @@ const updateEmployee = async (req, res) => {
     const { id } = req.params;
   
     try {
-   
-  
-      // Fetch the existing employee
+      // Fetching the existing employee using id
       const existingEmployee = await Employee.findById(id);
       if (!existingEmployee) {
         return res.status(404).json({
@@ -138,24 +128,23 @@ const updateEmployee = async (req, res) => {
         });
       }
   
-      let imageUrl = existingEmployee.Image; // Keep existing image URL by default
+      let imageUrl = existingEmployee.Image; // Keep the existing image url by default
   
       // If a new file is uploaded, handle the image update
       if (req.file) {
         // Upload new image to Cloudinary
         const newImageUrl = await uploadToCloudinary(req.file.buffer);
-        imageUrl = newImageUrl; // Update the image URL
+        imageUrl = newImageUrl; // Update image URL
       }
   
       // Update employee details
-      const updatedEmployee = await Employee.findByIdAndUpdate(
-        id,
+      const updatedEmployee = await Employee.findByIdAndUpdate(id,
         {$set:{ ...req.body, Image: imageUrl} },
         { new: true ,runValidators:true}
       );
   if(!updatedEmployee){
     return res.status(400).json({
-      success: true,
+      success: false,
       message: "Employee updated failed",
     });
   }
@@ -178,7 +167,7 @@ const updateEmployee = async (req, res) => {
     const { id } = req.params;
   
     try {
-      // Find the employee by ID
+      // Find the employee using id
       const employeeToDelete = await Employee.findById(id);
       if (!employeeToDelete) {
         return res.status(404).json({
@@ -187,13 +176,12 @@ const updateEmployee = async (req, res) => {
         });
       }
   
-      // Optional: Delete the image from Cloudinary
+      // Delete the image from Cloudinary
       const publicId = employeeToDelete.Image.split('/').pop().split('.')[0]; // Assuming Image URL format
       await cloudinary.uploader.destroy(publicId); // Delete image from Cloudinary
   
       // Delete employee from database
       await Employee.findByIdAndDelete(id);
-  
       res.status(200).json({
         success: true,
         message: "Employee deleted successfully",

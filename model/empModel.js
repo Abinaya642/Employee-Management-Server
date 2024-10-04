@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema(
   {
-    EmployeeName: { type: String, trim: true },
+    EmployeeName: { type: String, 
+      trim: true },
     EmployeeID: { type: Number, trim: true },
     Department: { type: String, trim: true },
     Designation: { type: String, trim: true },
@@ -16,12 +17,3 @@ const employeeSchema = new mongoose.Schema(
 
 module.exports = mongoose.model("Employee", employeeSchema);
 
-// {
-//     "EmployeeName":"mahathi",
-// "EmployeeID":"2",
-// "Department":"sales",
-// "Designation":"executive",
-// "Project":"ProjectA",
-// "Type":"remote",
-// "Status":"immediate",
-// }
