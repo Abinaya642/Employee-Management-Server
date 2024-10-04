@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 //port
-const port = 4050;
+const {PORT} = process.env;
 
 app.use(express.json());
 
@@ -32,12 +32,13 @@ app.get("/emp", (req, res) => {
   res.json(200);
 });
 
+
 mongoose
   .connect(process.env.MONGODB_URL)
   .then((res) => {
     console.log("MongoDB connected");
 
-    app.listen(port, () => {
+    app.listen(PORT, () => {
       console.log("success");
     });
   })

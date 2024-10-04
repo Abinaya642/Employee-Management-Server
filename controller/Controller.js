@@ -25,19 +25,17 @@ const createEmployee = async (req, res) => {
       Project,
       Type,
       Status,
-      Image
     } = req.body;
 
     // Validate required fields
     if (
-      !EmployeeName ||
-      !EmployeeID ||
-      !Department ||
-      !Designation ||
-      !Project ||
-      !Type ||
-      !Status ||
-      !Image
+      !EmployeeName ,
+      !EmployeeID ,
+      !Department ,
+      !Designation ,
+      !Project ,
+      !Type ,
+      !Status
     ) {
       return res.status(400).json({
         success: false,
@@ -129,31 +127,7 @@ const updateEmployee = async (req, res) => {
     const { id } = req.params;
   
     try {
-      // Validate required fields
-      const {
-        EmployeeName,
-        EmployeeID,
-        Department,
-        Designation,
-        Project,
-        Type,
-        Status,
-      } = req.body;
-  
-      if (
-        !EmployeeName ||
-        !EmployeeID ||
-        !Department ||
-        !Designation ||
-        !Project ||
-        !Type ||
-        !Status
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: "All fields are required.",
-        });
-      }
+   
   
       // Fetch the existing employee
       const existingEmployee = await Employee.findById(id);
@@ -176,10 +150,15 @@ const updateEmployee = async (req, res) => {
       // Update employee details
       const updatedEmployee = await Employee.findByIdAndUpdate(
         id,
-        { ...req.body, Image: imageUrl },
-        { new: true }
+        {$set:{ ...req.body, Image: imageUrl} },
+        { new: true ,runValidators:true}
       );
-  
+  if(!updatedEmployee){
+    return res.status(400).json({
+      success: true,
+      message: "Employee updated failed",
+    });
+  }
       res.status(200).json({
         success: true,
         message: "Employee updated successfully",
@@ -193,7 +172,7 @@ const updateEmployee = async (req, res) => {
       });
     }
   };
-  
+
 
   const deleteEmployee = async (req, res) => {
     const { id } = req.params;
@@ -238,13 +217,3 @@ module.exports = {
   deleteEmployee,
 };
 
-// fileFilter: function(req, file, cb) {
-//     const filetypes = /jpeg|jpg|png|gif/; // Allowed file types
-//     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-//     const mimetype = filetypes.test(file.mimetype);
-//     if (mimetype && extname) {
-//         return cb(null, true);
-//     } else {
-//         cb('Error: Images Only!'); // Error message for invalid file type
-//     }
-// }
