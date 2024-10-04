@@ -21,7 +21,7 @@ cloudinary.config({
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://employee-management-client.netlify.app/",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   })
 );
