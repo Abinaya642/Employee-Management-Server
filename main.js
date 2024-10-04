@@ -19,7 +19,7 @@ cloudinary.config({
 
 app.use(
   cors({
-    origin: "https://employee-management-client.netlify.app/",
+    origin: "https://employee-management-client.netlify.app",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   })
 );
